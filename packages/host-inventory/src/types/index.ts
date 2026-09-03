@@ -98,7 +98,7 @@ export interface AdvisorAppData {
     'low'?: number | null;
 }
 /**
- * Application data fields available for sorting in the /hosts-view endpoint. Use format `app_name:field_name` with the `order_by` parameter.  **Advisor** - `advisor:recommendations` - Number of Advisor recommendations - `advisor:incidents` - Number of Advisor incidents - `advisor:critical` - Critical severity recommendations - `advisor:important` - Important severity recommendations - `advisor:moderate` - Moderate severity recommendations - `advisor:low` - Low severity recommendations  **Vulnerability** - `vulnerability:total_cves` - Total CVE count - `vulnerability:critical_cves` - Critical severity CVEs - `vulnerability:important_cves` - Important severity CVEs - `vulnerability:cves_with_security_rules` - CVEs with security rules - `vulnerability:cves_with_known_exploits` - CVEs with known exploits  **Patch** - `patch:advisories_total_installable` - Total installable advisories (sum of all types) - `patch:advisories_total_applicable` - Total applicable advisories (sum of all types) - `patch:advisories_rhsa_installable` - Number of RHSA installable advisories - `patch:advisories_rhba_installable` - Number of RHBA installable advisories - `patch:advisories_rhea_installable` - Number of RHEA installable advisories - `patch:advisories_other_installable` - Number of other installable advisories - `patch:advisories_rhsa_applicable` - Number of RHSA applicable advisories - `patch:advisories_rhba_applicable` - Number of RHBA applicable advisories - `patch:advisories_rhea_applicable` - Number of RHEA applicable advisories - `patch:advisories_other_applicable` - Number of other applicable advisories - `patch:packages_installable` - Number of installable packages - `patch:packages_applicable` - Number of applicable packages - `patch:packages_installed` - Number of installed packages - `patch:template_name` - Patch template name  **Remediations** - `remediations:remediations_plans` - Active remediation plans count  **Compliance** - `compliance:last_scan` - Last compliance scan timestamp - `compliance:policies_count` - Number of compliance policies  **Malware** - `malware:last_matches` - Malware matches count - `malware:total_matches` - Total malware matches count - `malware:last_scan` - Last malware scan timestamp - `malware:last_status` - Last malware detection status
+ * Application data fields available for sorting in the /hosts-view endpoint. Use format `app_name:field_name` with the `order_by` parameter.  **Advisor** - `advisor:recommendations` - Number of Advisor recommendations - `advisor:incidents` - Number of Advisor incidents - `advisor:critical` - Critical severity recommendations - `advisor:important` - Important severity recommendations - `advisor:moderate` - Moderate severity recommendations - `advisor:low` - Low severity recommendations - `advisor:total_severity` - Weighted severity score (critical×1000 + important×100 + moderate×10 + low)  **Vulnerability** - `vulnerability:total_cves` - Total CVE count - `vulnerability:critical_cves` - Critical severity CVEs - `vulnerability:important_cves` - Important severity CVEs - `vulnerability:cves_with_security_rules` - CVEs with security rules - `vulnerability:cves_with_known_exploits` - CVEs with known exploits  **Patch** - `patch:advisories_total_installable` - Total installable advisories (sum of all types) - `patch:advisories_total_applicable` - Total applicable advisories (sum of all types) - `patch:advisories_rhsa_installable` - Number of RHSA installable advisories - `patch:advisories_rhba_installable` - Number of RHBA installable advisories - `patch:advisories_rhea_installable` - Number of RHEA installable advisories - `patch:advisories_other_installable` - Number of other installable advisories - `patch:advisories_rhsa_applicable` - Number of RHSA applicable advisories - `patch:advisories_rhba_applicable` - Number of RHBA applicable advisories - `patch:advisories_rhea_applicable` - Number of RHEA applicable advisories - `patch:advisories_other_applicable` - Number of other applicable advisories - `patch:packages_installable` - Number of installable packages - `patch:packages_applicable` - Number of applicable packages - `patch:packages_installed` - Number of installed packages - `patch:template_name` - Patch template name  **Remediations** - `remediations:remediations_plans` - Active remediation plans count  **Compliance** - `compliance:last_scan` - Last compliance scan timestamp - `compliance:policies_count` - Number of compliance policies  **Malware** - `malware:last_matches` - Malware matches count - `malware:total_matches` - Total malware matches count - `malware:last_scan` - Last malware scan timestamp - `malware:last_status` - Last malware detection status
  * @export
  * @enum {string}
  */
@@ -110,6 +110,7 @@ export const AppSortableFields = {
     Advisorimportant: 'advisor:important',
     Advisormoderate: 'advisor:moderate',
     Advisorlow: 'advisor:low',
+    AdvisortotalSeverity: 'advisor:total_severity',
     VulnerabilitytotalCves: 'vulnerability:total_cves',
     VulnerabilitycriticalCves: 'vulnerability:critical_cves',
     VulnerabilityimportantCves: 'vulnerability:important_cves',
@@ -2305,53 +2306,84 @@ export type SystemProfileSystemUpdateMethodEnum = typeof SystemProfileSystemUpda
  */
 export interface SystemProfileAnsible {
     /**
-     * The ansible-tower or automation-controller version on the host
+     * The installed ansible-tower or automation-controller RPM version
      * @type {string}
      * @memberof SystemProfileAnsible
      */
     'controller_version'?: string;
     /**
-     * The automation-hub version on the host
+     * The installed automation-hub RPM version
      * @type {string}
      * @memberof SystemProfileAnsible
      */
     'hub_version'?: string;
     /**
-     * The catalog-worker version on the host
+     * The installed catalog-worker RPM version
      * @type {string}
      * @memberof SystemProfileAnsible
      */
     'catalog_worker_version'?: string;
     /**
-     * The SSO version on the host
+     * The installed SSO RPM version
      * @type {string}
      * @memberof SystemProfileAnsible
      */
     'sso_version'?: string;
     /**
-     * The receptor version on the host
+     * The installed receptor RPM version
      * @type {string}
      * @memberof SystemProfileAnsible
      */
     'receptor_version'?: string;
     /**
-     * The ansible-runner version on the host
+     * The installed ansible-runner RPM version
      * @type {string}
      * @memberof SystemProfileAnsible
      */
     'runner_version'?: string;
     /**
-     * The EDA controller version on the host
+     * The installed automation-eda-controller RPM version
      * @type {string}
      * @memberof SystemProfileAnsible
      */
     'eda_controller_version'?: string;
     /**
-     * The automation gateway version on the host
+     * The installed automation-gateway RPM version
      * @type {string}
      * @memberof SystemProfileAnsible
      */
     'gateway_version'?: string;
+    /**
+     *
+     * @type {Array<SystemProfileAnsibleContainersInner>}
+     * @memberof SystemProfileAnsible
+     */
+    'containers'?: Array<SystemProfileAnsibleContainersInner>;
+}
+/**
+ * A container on the system
+ * @export
+ * @interface SystemProfileAnsibleContainersInner
+ */
+export interface SystemProfileAnsibleContainersInner {
+    /**
+     *
+     * @type {string}
+     * @memberof SystemProfileAnsibleContainersInner
+     */
+    'name'?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof SystemProfileAnsibleContainersInner
+     */
+    'image'?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof SystemProfileAnsibleContainersInner
+     */
+    'state'?: string;
 }
 /**
  * Object containing image data from command bootc status
@@ -3095,10 +3127,10 @@ export interface SystemProfileThirdPartyServicesCrowdstrike {
 export interface SystemProfileWorkloads {
     /**
      *
-     * @type {SystemProfileAnsible}
+     * @type {SystemProfileWorkloadsAnsible}
      * @memberof SystemProfileWorkloads
      */
-    'ansible'?: SystemProfileAnsible;
+    'ansible'?: SystemProfileWorkloadsAnsible;
     /**
      *
      * @type {SystemProfileThirdPartyServicesCrowdstrike}
@@ -3147,6 +3179,67 @@ export interface SystemProfileWorkloads {
      * @memberof SystemProfileWorkloads
      */
     'sap'?: SystemProfileSap;
+}
+/**
+ * Object containing data specific to Ansible Automation Platform
+ * @export
+ * @interface SystemProfileWorkloadsAnsible
+ */
+export interface SystemProfileWorkloadsAnsible {
+    /**
+     * The installed ansible-tower or automation-controller RPM version
+     * @type {string}
+     * @memberof SystemProfileWorkloadsAnsible
+     */
+    'controller_version'?: string;
+    /**
+     * The installed automation-hub RPM version
+     * @type {string}
+     * @memberof SystemProfileWorkloadsAnsible
+     */
+    'hub_version'?: string;
+    /**
+     * The installed catalog-worker RPM version
+     * @type {string}
+     * @memberof SystemProfileWorkloadsAnsible
+     */
+    'catalog_worker_version'?: string;
+    /**
+     * The installed SSO RPM version
+     * @type {string}
+     * @memberof SystemProfileWorkloadsAnsible
+     */
+    'sso_version'?: string;
+    /**
+     * The installed receptor RPM version
+     * @type {string}
+     * @memberof SystemProfileWorkloadsAnsible
+     */
+    'receptor_version'?: string;
+    /**
+     * The installed ansible-runner RPM version
+     * @type {string}
+     * @memberof SystemProfileWorkloadsAnsible
+     */
+    'runner_version'?: string;
+    /**
+     * The installed automation-eda-controller RPM version
+     * @type {string}
+     * @memberof SystemProfileWorkloadsAnsible
+     */
+    'eda_controller_version'?: string;
+    /**
+     * The installed automation-gateway RPM version
+     * @type {string}
+     * @memberof SystemProfileWorkloadsAnsible
+     */
+    'gateway_version'?: string;
+    /**
+     *
+     * @type {Array<Items>}
+     * @memberof SystemProfileWorkloadsAnsible
+     */
+    'containers'?: Array<Items>;
 }
 /**
  * Object containing data specific to the IBM DB2 workload
@@ -3255,11 +3348,23 @@ export interface SystemProfileWorkloadsSatellite {
      */
     'type'?: SystemProfileWorkloadsSatelliteTypeEnum;
     /**
-     * The Satellite or Capsule version
+     * The installed satellite or satellite-capsule RPM version
      * @type {string}
      * @memberof SystemProfileWorkloadsSatellite
      */
     'version'?: string;
+    /**
+     * The installed foremanctl RPM version
+     * @type {string}
+     * @memberof SystemProfileWorkloadsSatellite
+     */
+    'foremanctl_version'?: string;
+    /**
+     *
+     * @type {Array<Items>}
+     * @memberof SystemProfileWorkloadsSatellite
+     */
+    'containers'?: Array<Items>;
 }
 
 export const SystemProfileWorkloadsSatelliteTypeEnum = {
